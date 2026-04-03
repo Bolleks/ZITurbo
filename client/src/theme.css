@@ -115,6 +115,11 @@ textarea.input-custom {
   min-height: 100px;
 }
 
+.input-custom:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ===== Buttons ===== */
 .btn-primary-custom {
   background: var(--accent-gradient);

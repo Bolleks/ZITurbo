@@ -29,6 +29,7 @@ function PromptInput({ onGenerate, loading }) {
           placeholder="Опишите изображение, которое хотите сгенерировать..."
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
+          disabled={loading}
           required
         />
       </div>
@@ -40,6 +41,7 @@ function PromptInput({ onGenerate, loading }) {
           className="input-custom"
           value={aspectRatio}
           onChange={(e) => setAspectRatio(e.target.value)}
+          disabled={loading}
         >
           {ASPECT_RATIOS.map((ratio) => (
             <option key={ratio} value={ratio}>{ratio}</option>
@@ -47,12 +49,13 @@ function PromptInput({ onGenerate, loading }) {
         </select>
       </div>
 
-      <div style={{ marginBottom: 24 }}>
+      <div style={{ marginBottom: 24, opacity: loading ? 0.5 : 1, pointerEvents: loading ? 'none' : 'auto' }}>
         <label className="checkbox-custom">
           <input
             type="checkbox"
             checked={nsfwChecker}
             onChange={(e) => setNsfwChecker(e.target.checked)}
+            disabled={loading}
           />
           Включить NSFW-фильтр
         </label>
