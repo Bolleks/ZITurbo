@@ -141,7 +141,7 @@ function App() {
         <div className="app-grid">
           <div className="app-sidebar">
             <div className="fade-in">
-              <PromptInput onGenerate={handleGenerate} loading={loading} />
+              <PromptInput onGenerate={handleGenerate} onReset={handleReset} loading={loading} />
             </div>
 
             {(taskId || taskStatus) && (
@@ -151,14 +151,6 @@ function App() {
                   status={taskStatus}
                   failMsg={failMsg}
                 />
-              </div>
-            )}
-
-            {taskStatus === 'fail' && (
-              <div className="fade-in">
-                <button className="btn-secondary-custom" onClick={handleReset}>
-                  Сбросить
-                </button>
               </div>
             )}
           </div>

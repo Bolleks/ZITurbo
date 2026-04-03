@@ -166,6 +166,25 @@ textarea.input-custom {
   color: var(--text-primary);
 }
 
+.btn-reset {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 8px;
+  border-radius: var(--border-radius-sm);
+  transition: color var(--transition), background-color var(--transition);
+}
+
+.btn-reset:hover {
+  color: var(--danger);
+  background: var(--danger-bg);
+}
+
 .btn-success-custom {
   background: var(--success);
   color: #ffffff;

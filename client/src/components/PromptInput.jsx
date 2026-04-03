@@ -2,10 +2,19 @@ import React, { useState } from 'react';
 
 const ASPECT_RATIOS = ['1:1', '4:3', '3:4', '16:9', '9:16'];
 
-function PromptInput({ onGenerate, loading }) {
+function PromptInput({ onGenerate, onReset, loading }) {
   const [prompt, setPrompt] = useState('');
   const [aspectRatio, setAspectRatio] = useState('1:1');
   const [nsfwChecker, setNsfwChecker] = useState(true);
+
+  const hasChanges = prompt.length > 0 || aspectRatio !== '1:1' || nsfwChecker !== true;
+
+  const handleReset = () => {
+    setPrompt('');
+    setAspectRatio('1:1');
+    setNsfwChecker(true);
+    if (onReset) onReset();
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -75,6 +84,16 @@ function PromptInput({ onGenerate, loading }) {
           'Сгенерировать'
         )}
       </button>
+
+      {hasChanges && !loading && (
+        <button
+          type="button"
+          className="btn-reset"
+          onClick={handleReset}
+        >
+          Сбросить
+        </button>
+      )}
     </form>
   );
 }
