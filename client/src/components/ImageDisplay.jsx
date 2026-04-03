@@ -4,6 +4,20 @@ function ImageDisplay({ imageUrl, downloadUrl }) {
   const [downloading, setDownloading] = useState(false);
   const [downloadLink, setDownloadLink] = useState(downloadUrl || null);
 
+  const handleOpenInNewTab = async () => {
+    if (!imageUrl) return;
+
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    } catch (err) {
+      console.error('Ошибка при открытии изображения:', err);
+      window.open(imageUrl, '_blank');
+    }
+  };
+
   const handleDownload = async () => {
     if (downloadLink) {
       window.open(downloadLink, '_blank');
@@ -45,7 +59,7 @@ function ImageDisplay({ imageUrl, downloadUrl }) {
       <div
         className="image-result"
         style={{ marginBottom: 20, cursor: 'pointer' }}
-        onClick={() => window.open(imageUrl, '_blank')}
+        onClick={handleOpenInNewTab}
         title="Открыть в новой вкладке"
       >
         <img src={imageUrl} alt="Сгенерированное изображение" />
