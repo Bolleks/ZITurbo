@@ -17,7 +17,39 @@
 | **Backend** | Node.js, Express, Axios |
 | **Frontend** | React 18, Vite, Bootstrap 5 |
 
-## Быстрый старт
+## Деплой через Coolify (Docker Compose)
+
+1. В Coolify нажмите **New Resource** → **Docker Compose Empty**
+2. Укажите репозиторий: `https://github.com/Bolleks/ZITurbo`
+3. В настройках ресурса укажите:
+   - **Docker Compose Location**: `docker-compose.yml` (по умолчанию)
+   - **Ports**: `3000` (фронтенд)
+4. В **Environment Variables** добавьте:
+   - `KIE_API_KEY` — ваш API-ключ от Kie.ai
+5. Нажмите **Deploy**
+
+Coolify автоматически:
+- Соберёт оба образа (server + client)
+- Запустит Nginx на порту 3000
+- Настроит проксирование `/api/` → backend на порт 3001
+
+## Локальный запуск (Docker Compose)
+
+```bash
+# Создайте .env файл
+cp .env.example .env
+# Вставьте KIE_API_KEY=ваш_ключ
+
+# Запуск
+docker compose up -d
+
+# Остановка
+docker compose down
+```
+
+Откройте `http://localhost:3000`.
+
+## Локальный запуск (без Docker)
 
 ### 1. Получите API-ключ
 

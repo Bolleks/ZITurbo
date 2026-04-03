@@ -1,0 +1,31 @@
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: ziturbo-server
+    restart: unless-stopped
+    environment:
+      - KIE_API_KEY=${KIE_API_KEY}
+      - PORT=3001
+    expose:
+      - "3001"
+    networks:
+      - ziturbo-net
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: ziturbo-client
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    networks:
+      - ziturbo-net
+
+networks:
+  ziturbo-net:
+    driver: bridge
