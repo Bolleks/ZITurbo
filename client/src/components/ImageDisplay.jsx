@@ -42,7 +42,12 @@ function ImageDisplay({ imageUrl, downloadUrl }) {
     <div className="card-custom">
       <h5 className="card-custom-title">Результат</h5>
 
-      <div className="image-result" style={{ marginBottom: 20 }}>
+      <div
+        className="image-result"
+        style={{ marginBottom: 20, cursor: 'pointer' }}
+        onClick={() => window.open(imageUrl, '_blank')}
+        title="Открыть в новой вкладке"
+      >
         <img src={imageUrl} alt="Сгенерированное изображение" />
       </div>
 

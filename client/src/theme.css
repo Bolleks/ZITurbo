@@ -308,6 +308,12 @@ textarea.input-custom {
   border-radius: var(--border-radius);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+
+.image-result:hover {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+  transform: scale(1.005);
 }
 
 .image-result img {
