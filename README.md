@@ -5,6 +5,7 @@
 ## Возможности
 
 - Генерация изображений по текстовому описанию (промпту)
+- **Анализ изображений и автоматическая генерация промпта с помощью Gemini 3 Flash**
 - Выбор соотношения сторон: 1:1, 4:3, 3:4, 16:9, 9:16
 - NSFW-фильтр
 - Отслеживание статуса генерации в реальном времени
@@ -94,6 +95,7 @@ cd client && npm run dev
 | `POST` | `/api/generate` | Создать задачу генерации |
 | `GET`  | `/api/status/:taskId` | Получить статус задачи |
 | `POST` | `/api/download-url` | Получить ссылку на скачивание |
+| `POST` | `/api/analyze-image` | **Анализ изображения и генерация промпта** |
 
 ### Пример запроса генерации
 
@@ -118,6 +120,24 @@ POST /api/generate
 }
 ```
 
+### Пример запроса анализа изображения
+
+```json
+POST /api/analyze-image
+{
+  "imageUrl": "https://example.com/image.jpg"
+  // или base64: "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
+}
+```
+
+### Ответ
+
+```json
+{
+  "prompt": "A photorealistic image of a cozy cafe terrace in Paris, warm afternoon lighting, wooden tables with checkered tablecloths, vintage lanterns hanging from the ceiling, large windows overlooking a cobblestone street, soft golden hour atmosphere, shallow depth of field, cinematic composition, 35mm lens perspective"
+}
+```
+
 ## Структура проекта
 
 ```
@@ -129,14 +149,16 @@ ImageSearcher/
 │   ├── src/
 │   │   ├── App.jsx        # Главный компонент
 │   │   ├── main.jsx       # Точка входа React
+│   │   ├── theme.css      # Глобальные стили
 │   │   └── components/
-│   │       ├── PromptInput.jsx      # Форма ввода
+│   │       ├── PromptInput.jsx      # Форма ввода + загрузка изображения
 │   │       ├── StatusTracker.jsx    # Статус задачи
 │   │       └── ImageDisplay.jsx     # Отображение результата
 │   ├── index.html
 │   ├── vite.config.js
 │   └── package.json
 ├── .env.example
+├── gemini-3-flash.md      # Документация Gemini API
 └── README.md
 ```
 

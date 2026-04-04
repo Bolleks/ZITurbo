@@ -4,18 +4,9 @@ function ImageDisplay({ imageUrl, downloadUrl }) {
   const [downloading, setDownloading] = useState(false);
   const [downloadLink, setDownloadLink] = useState(downloadUrl || null);
 
-  const handleOpenInNewTab = async () => {
+  const handleOpenInNewTab = () => {
     if (!imageUrl) return;
-
-    try {
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      window.open(blobUrl, '_blank');
-    } catch (err) {
-      console.error('Ошибка при открытии изображения:', err);
-      window.open(imageUrl, '_blank');
-    }
+    window.open(imageUrl, '_blank');
   };
 
   const handleDownload = async () => {

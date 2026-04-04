@@ -22,7 +22,8 @@ const kieApi = axios.create({
 });
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // POST /api/generate — создание задачи генерации
 app.post('/api/generate', async (req, res) => {
@@ -74,6 +75,156 @@ app.get('/api/status/:taskId', async (req, res) => {
     console.error('Ошибка при получении статуса:', error.response?.data || error.message);
     res.status(error.response?.status || 500).json({
       error: error.response?.data?.msg || 'Ошибка при получении статуса задачи'
+    });
+  }
+});
+
+// POST /api/analyze-image — анализ изображения и получение промпта
+app.post('/api/analyze-image', async (req, res) => {
+  try {
+    const { imageUrl } = req.body;
+
+    if (!imageUrl) {
+      return res.status(422).json({ error: 'imageUrl обязателен' });
+    }
+
+    console.log('Получено изображение, длина:', imageUrl.length);
+    console.log('Тип данных:', imageUrl.substring(0, 50));
+
+    const messages = [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: `Analyze this image in detail and create a detailed prompt that will allow for the recreation of a maximally similar image.
+
+Structure the description as follows:
+
+MAIN SUBJECT: Describe the main object/character with maximum detail (appearance, pose, clothing, facial expression).
+COMPOSITION AND PLACEMENT: Precise positioning of elements within the frame, camera angle.
+STYLE AND TECHNIQUE: Artistic style, execution technique (photography, painting, digital art).
+COLOR PALETTE: Dominant colors, lighting, contrast, saturation.
+BACKGROUND AND ENVIRONMENT: Detailed description of the background, atmosphere.
+TECHNICAL PARAMETERS: Depth of field, shot type, image quality.
+MOOD AND ATMOSPHERE: Emotional component of the image.
+Formulate the final prompt as one cohesive text, incorporating all key details in a natural order. Use concrete, descriptive terms and avoid abstract concepts. IMPORTANT: Show only the Final Prompt without your comments.
+
+EXAMPLE: "A high-quality realistic photograph of a woman with long wavy brown hair and fair skin stands in shallow water up to her knees, wearing a soft green smocked mini dress with puffed short sleeves and a square neckline. Her left leg is slightly bent, arms relaxed—left arm hanging, right arm with a thin silver bracelet, hands slightly open—while she gazes directly at the camera with a calm expression. Positioned on the left side of the frame, the eye-level camera captures her figure with soft natural golden light, shallow depth of field, and detailed fabric texture. Dominant colors include soft green (dress), blue-green (water), and warm yellow-green (background foliage), with golden light reflections on the water and the subject's reflection visible. The background features blurred greenery and yellow foliage (trees/bushes) behind a calm river/lake with gentle ripples. Mood: serene, tranquil, and naturally elegant."
+
+Important: The number of characters in the final prompt should not exceed 1,000 characters.`
+          },
+          {
+            type: 'image_url',
+            image_url: {
+              url: imageUrl
+            }
+          }
+        ]
+      }
+    ];
+
+    console.log('Отправка запроса к Gemini API...');
+
+    const response = await kieApi.post('/gemini-3-flash/v1/chat/completions', {
+      messages,
+      stream: false,
+      include_thoughts: false,
+      reasoning_effort: 'high'
+    });
+
+    console.log('Ответ от Gemini API:', response.status);
+
+    const generatedPrompt = response.data.choices?.[0]?.message?.content;
+
+    if (!generatedPrompt) {
+      console.error('Пустой ответ от API:', response.data);
+      return res.status(500).json({ error: 'Не удалось сгенерировать промпт' });
+    }
+
+    // Обрезаем до 1000 символов если нужно
+    const trimmedPrompt = generatedPrompt.length > 1000
+      ? generatedPrompt.substring(0, 1000)
+      : generatedPrompt;
+
+    res.json({ prompt: trimmedPrompt });
+  } catch (error) {
+    console.error('Ошибка при анализе изображения:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    res.status(error.response?.status || 500).json({
+      error: error.response?.data?.msg || error.response?.data?.error?.message || 'Ошибка при анализе изображения'
+    });
+  }
+});
+
+// POST /api/enhance-prompt — улучшение промпта пользователя
+app.post('/api/enhance-prompt', async (req, res) => {
+  try {
+    const { prompt } = req.body;
+
+    if (!prompt) {
+      return res.status(422).json({ error: 'prompt обязателен' });
+    }
+
+    const systemPrompt = `Analyze this image in detail and create a detailed prompt that will allow for the recreation of a maximally similar image.
+
+Structure the description as follows:
+
+MAIN SUBJECT: Describe the main object/character with maximum detail (appearance, pose, clothing, facial expression).
+COMPOSITION AND PLACEMENT: Precise positioning of elements within the frame, camera angle.
+STYLE AND TECHNIQUE: Artistic style, execution technique (photography, painting, digital art).
+COLOR PALETTE: Dominant colors, lighting, contrast, saturation.
+BACKGROUND AND ENVIRONMENT: Detailed description of the background, atmosphere.
+TECHNICAL PARAMETERS: Depth of field, shot type, image quality.
+MOOD AND ATMOSPHERE: Emotional component of the image.
+Formulate the final prompt as one cohesive text, incorporating all key details in a natural order. Use concrete, descriptive terms and avoid abstract concepts. IMPORTANT: Show only the Final Prompt without your comments.
+
+EXAMPLE: "A high-quality realistic photograph of a woman with long wavy brown hair and fair skin stands in shallow water up to her knees, wearing a soft green smocked mini dress with puffed short sleeves and a square neckline. Her left leg is slightly bent, arms relaxed—left arm hanging, right arm with a thin silver bracelet, hands slightly open—while she gazes directly at the camera with a calm expression. Positioned on the left side of the frame, the eye-level camera captures her figure with soft natural golden light, shallow depth of field, and detailed fabric texture. Dominant colors include soft green (dress), blue-green (water), and warm yellow-green (background foliage), with golden light reflections on the water and the subject's reflection visible. The background features blurred greenery and yellow foliage (trees/bushes) behind a calm river/lake with gentle ripples. Mood: serene, tranquil, and naturally elegant."
+
+Important: The number of characters in the final prompt should not exceed 1,000 characters.`;
+
+    const messages = [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: `${systemPrompt}\n\nBased on the following user prompt, enhance it using the same structure and principles:\n\n"${prompt}"`
+          }
+        ]
+      }
+    ];
+
+    const response = await kieApi.post('/gemini-3-flash/v1/chat/completions', {
+      messages,
+      stream: false,
+      include_thoughts: false,
+      reasoning_effort: 'high'
+    });
+
+    const enhancedPrompt = response.data.choices?.[0]?.message?.content;
+
+    if (!enhancedPrompt) {
+      console.error('Пустой ответ от API:', response.data);
+      return res.status(500).json({ error: 'Не удалось улучшить промпт' });
+    }
+
+    const trimmedPrompt = enhancedPrompt.length > 1000
+      ? enhancedPrompt.substring(0, 1000)
+      : enhancedPrompt;
+
+    res.json({ prompt: trimmedPrompt });
+  } catch (error) {
+    console.error('Ошибка при улучшении промпта:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    res.status(error.response?.status || 500).json({
+      error: error.response?.data?.msg || error.response?.data?.error?.message || 'Ошибка при улучшении промпта'
     });
   }
 });

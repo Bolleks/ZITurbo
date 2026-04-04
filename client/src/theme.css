@@ -185,6 +185,36 @@ textarea.input-custom {
   background: var(--danger-bg);
 }
 
+.btn-enhance {
+  background: transparent;
+  color: var(--warning);
+  border: 1px solid var(--warning);
+  padding: 6px 14px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.btn-enhance:hover:not(:disabled) {
+  background: var(--warning-bg);
+  transform: translateY(-1px);
+}
+
+.btn-enhance:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner-dark {
+  border-color: rgba(0, 0, 0, 0.15);
+  border-top-color: var(--text-secondary);
+}
+
 .btn-success-custom {
   background: var(--success);
   color: #ffffff;
