@@ -1,8 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 const ASPECT_RATIOS = ['1:1', '4:3', '3:4', '16:9', '9:16'];
 
-function PromptInput({ onGenerate, onReset, loading }) {
+function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApplied }) {
   const [prompt, setPrompt] = useState('');
   const [aspectRatio, setAspectRatio] = useState('1:1');
   const [nsfwChecker, setNsfwChecker] = useState(true);
@@ -10,6 +10,14 @@ function PromptInput({ onGenerate, onReset, loading }) {
   const [enhancing, setEnhancing] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const fileInputRef = useRef(null);
+
+  // Apply selected prompt from history
+  useEffect(() => {
+    if (selectedPrompt) {
+      setPrompt(selectedPrompt);
+      if (onPromptApplied) onPromptApplied();
+    }
+  }, [selectedPrompt, onPromptApplied]);
 
   const hasChanges = prompt.length > 0 || aspectRatio !== '1:1' || nsfwChecker !== true;
 
@@ -169,7 +177,7 @@ function PromptInput({ onGenerate, onReset, loading }) {
             type="button"
             className="btn-enhance"
             onClick={handleEnhancePrompt}
-            disabled={loading || enhancing || !prompt.trim()}
+            disabled={loading || enhancing || analyzing || !prompt.trim()}
             title="Улучшить промпт с помощью AI"
           >
             {enhancing ? (
@@ -195,7 +203,7 @@ function PromptInput({ onGenerate, onReset, loading }) {
           placeholder="Опишите изображение, которое хотите сгенерировать..."
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          disabled={loading}
+          disabled={loading || analyzing}
           required
         />
       </div>
@@ -207,7 +215,7 @@ function PromptInput({ onGenerate, onReset, loading }) {
           className="input-custom"
           value={aspectRatio}
           onChange={(e) => setAspectRatio(e.target.value)}
-          disabled={loading}
+          disabled={loading || analyzing}
         >
           {ASPECT_RATIOS.map((ratio) => (
             <option key={ratio} value={ratio}>{ratio}</option>
@@ -215,13 +223,13 @@ function PromptInput({ onGenerate, onReset, loading }) {
         </select>
       </div>
 
-      <div style={{ marginBottom: 24, opacity: loading ? 0.5 : 1, pointerEvents: loading ? 'none' : 'auto' }}>
+      <div style={{ marginBottom: 24, opacity: (loading || analyzing) ? 0.5 : 1, pointerEvents: (loading || analyzing) ? 'none' : 'auto' }}>
         <label className="checkbox-custom">
           <input
             type="checkbox"
             checked={nsfwChecker}
             onChange={(e) => setNsfwChecker(e.target.checked)}
-            disabled={loading}
+            disabled={loading || analyzing}
           />
           Включить NSFW-фильтр
         </label>
@@ -230,12 +238,17 @@ function PromptInput({ onGenerate, onReset, loading }) {
       <button
         type="submit"
         className="btn-primary-custom"
-        disabled={loading || !prompt.trim()}
+        disabled={loading || analyzing || !prompt.trim()}
       >
         {loading ? (
           <>
             <span className="spinner-inline" style={{ marginRight: 8 }} />
             Генерация...
+          </>
+        ) : analyzing ? (
+          <>
+            <span className="spinner-inline" style={{ marginRight: 8 }} />
+            Анализ изображения...
           </>
         ) : (
           'Сгенерировать'

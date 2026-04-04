@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 
-function ImageDisplay({ imageUrl, downloadUrl }) {
+function ImageDisplay({ imageUrl, downloadUrl, onImageClick }) {
   const [downloading, setDownloading] = useState(false);
   const [downloadLink, setDownloadLink] = useState(downloadUrl || null);
 
-  const handleOpenInNewTab = () => {
-    if (!imageUrl) return;
-    window.open(imageUrl, '_blank');
+  const handleClick = () => {
+    if (onImageClick) {
+      onImageClick();
+    }
   };
 
   const handleDownload = async () => {
@@ -50,8 +51,8 @@ function ImageDisplay({ imageUrl, downloadUrl }) {
       <div
         className="image-result"
         style={{ marginBottom: 20, cursor: 'pointer' }}
-        onClick={handleOpenInNewTab}
-        title="Открыть в новой вкладке"
+        onClick={handleClick}
+        title="Нажмите для просмотра"
       >
         <img src={imageUrl} alt="Сгенерированное изображение" />
       </div>

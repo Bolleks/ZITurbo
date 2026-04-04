@@ -1,7 +1,10 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import PromptInput from './components/PromptInput';
 import StatusTracker from './components/StatusTracker';
 import ImageDisplay from './components/ImageDisplay';
+import ImageModal from './components/ImageModal';
+import History from './components/History';
+import { saveToHistory, getHistory } from './utils/historyStore';
 import { ThemeToggle } from './ThemeContext';
 
 const POLL_INTERVALS = [
@@ -17,7 +20,15 @@ function App() {
   const [taskStatus, setTaskStatus] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [failMsg, setFailMsg] = useState(null);
+  const [currentPrompt, setCurrentPrompt] = useState('');
+  const [currentAspectRatio, setCurrentAspectRatio] = useState('1:1');
+  const [selectedPrompt, setSelectedPrompt] = useState('');
+  const [history, setHistory] = useState(getHistory());
+  const [modalImage, setModalImage] = useState(null);
   const pollTimeoutRef = useRef(null);
+  // Refs для актуальных значений в замыкании pollTaskStatus
+  const promptRef = useRef('');
+  const aspectRatioRef = useRef('1:1');
 
   const clearPollTimeout = useCallback(() => {
     if (pollTimeoutRef.current) {
@@ -48,7 +59,17 @@ function App() {
         try {
           const parsed = JSON.parse(resultJson);
           if (parsed.resultUrls && parsed.resultUrls.length > 0) {
-            setImageUrl(parsed.resultUrls[0]);
+            const url = parsed.resultUrls[0];
+            setImageUrl(url);
+            const entry = saveToHistory({
+              prompt: promptRef.current,
+              imageUrl: url,
+              aspectRatio: aspectRatioRef.current,
+              timestamp: Date.now()
+            });
+            if (entry) {
+              setHistory(prev => [entry, ...prev]);
+            }
           }
         } catch (e) {
           console.error('Ошибка парсинга resultJson:', e);
@@ -91,6 +112,10 @@ function App() {
     setTaskStatus(null);
     setImageUrl(null);
     setFailMsg(null);
+    setCurrentPrompt(prompt);
+    setCurrentAspectRatio(aspect_ratio);
+    promptRef.current = prompt;
+    aspectRatioRef.current = aspect_ratio;
     clearPollTimeout();
 
     try {
@@ -127,6 +152,21 @@ function App() {
     setTaskStatus(null);
     setImageUrl(null);
     setFailMsg(null);
+    setCurrentPrompt('');
+    setCurrentAspectRatio('1:1');
+    setSelectedPrompt('');
+  };
+
+  const handleSelectPromptFromHistory = (prompt) => {
+    setSelectedPrompt(prompt);
+  };
+
+  const handleHistoryChange = (updatedHistory) => {
+    setHistory(updatedHistory || getHistory());
+  };
+
+  const handlePromptApplied = () => {
+    setSelectedPrompt('');
   };
 
   return (
@@ -141,10 +181,10 @@ function App() {
         <div className="app-grid">
           <div className="app-sidebar">
             <div className="fade-in">
-              <PromptInput onGenerate={handleGenerate} onReset={handleReset} loading={loading} />
+              <PromptInput onGenerate={handleGenerate} onReset={handleReset} loading={loading} selectedPrompt={selectedPrompt} onPromptApplied={handlePromptApplied} />
             </div>
 
-            {(taskId || taskStatus) && (
+            {(taskId && taskStatus !== 'success') && (
               <div className="fade-in">
                 <StatusTracker
                   taskId={taskId}
@@ -153,10 +193,18 @@ function App() {
                 />
               </div>
             )}
+
+            <div className="fade-in">
+              <History
+                history={history}
+                onSelectPrompt={handleSelectPromptFromHistory}
+                onHistoryChange={handleHistoryChange}
+              />
+            </div>
           </div>
 
           <div className="fade-in">
-            <ImageDisplay imageUrl={imageUrl} />
+            <ImageDisplay imageUrl={imageUrl} onImageClick={() => setModalImage(imageUrl)} />
             {!imageUrl && taskStatus !== 'fail' && (
               <div className="image-placeholder">
                 <p style={{ margin: 0, fontSize: '0.95rem' }}>
@@ -167,6 +215,10 @@ function App() {
           </div>
         </div>
       </div>
+
+      {modalImage && (
+        <ImageModal imageUrl={modalImage} onClose={() => setModalImage(null)} />
+      )}
     </>
   );
 }
