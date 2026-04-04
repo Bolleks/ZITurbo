@@ -4,6 +4,7 @@ import StatusTracker from './components/StatusTracker';
 import ImageDisplay from './components/ImageDisplay';
 import ImageModal from './components/ImageModal';
 import History from './components/History';
+import Rules from './components/Rules';
 import { saveToHistory, getHistory } from './utils/historyStore';
 import { ThemeToggle } from './ThemeContext';
 
@@ -25,6 +26,7 @@ function App() {
   const [selectedPrompt, setSelectedPrompt] = useState('');
   const [history, setHistory] = useState(getHistory());
   const [modalImage, setModalImage] = useState(null);
+  const [currentPage, setCurrentPage] = useState('main');
   const pollTimeoutRef = useRef(null);
   // Refs для актуальных значений в замыкании pollTaskStatus
   const promptRef = useRef('');
@@ -172,49 +174,76 @@ function App() {
   return (
     <>
       <ThemeToggle />
-      <div className="app-container">
-        <header className="app-header fade-in">
-          <h1>Z-Image Генератор</h1>
-          <p>Создание изображений с помощью AI (Kie.ai)</p>
-        </header>
 
-        <div className="app-grid">
-          <div className="app-sidebar">
-            <div className="fade-in">
-              <PromptInput onGenerate={handleGenerate} onReset={handleReset} loading={loading} selectedPrompt={selectedPrompt} onPromptApplied={handlePromptApplied} />
-            </div>
+      {currentPage === 'main' ? (
+        <div className="app-container">
+          <header className="app-header fade-in">
+            <h1>Z-Image Генератор</h1>
+            <p>Создание изображений с помощью AI (Kie.ai)</p>
+          </header>
 
-            {(taskId && taskStatus !== 'success') && (
+          <div className="app-rules-link">
+            <button className="btn-rules" onClick={() => setCurrentPage('rules')}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              Правила использования
+            </button>
+          </div>
+
+          <div className="app-grid">
+            <div className="app-sidebar">
               <div className="fade-in">
-                <StatusTracker
-                  taskId={taskId}
-                  status={taskStatus}
-                  failMsg={failMsg}
+                <PromptInput onGenerate={handleGenerate} onReset={handleReset} loading={loading} selectedPrompt={selectedPrompt} onPromptApplied={handlePromptApplied} />
+              </div>
+
+              {(taskId && taskStatus !== 'success') && (
+                <div className="fade-in">
+                  <StatusTracker
+                    taskId={taskId}
+                    status={taskStatus}
+                    failMsg={failMsg}
+                  />
+                </div>
+              )}
+
+              <div className="fade-in">
+                <History
+                  history={history}
+                  onSelectPrompt={handleSelectPromptFromHistory}
+                  onHistoryChange={handleHistoryChange}
                 />
               </div>
-            )}
+            </div>
 
             <div className="fade-in">
-              <History
-                history={history}
-                onSelectPrompt={handleSelectPromptFromHistory}
-                onHistoryChange={handleHistoryChange}
-              />
+              <ImageDisplay imageUrl={imageUrl} onImageClick={() => setModalImage(imageUrl)} />
+              {!imageUrl && taskStatus !== 'fail' && (
+                <div className="image-placeholder">
+                  <p style={{ margin: 0, fontSize: '0.95rem' }}>
+                    Здесь появится сгенерированное изображение
+                  </p>
+                </div>
+              )}
             </div>
           </div>
-
-          <div className="fade-in">
-            <ImageDisplay imageUrl={imageUrl} onImageClick={() => setModalImage(imageUrl)} />
-            {!imageUrl && taskStatus !== 'fail' && (
-              <div className="image-placeholder">
-                <p style={{ margin: 0, fontSize: '0.95rem' }}>
-                  Здесь появится сгенерированное изображение
-                </p>
-              </div>
-            )}
-          </div>
         </div>
-      </div>
+      ) : (
+        <div className="rules-container fade-in">
+          <button className="btn-rules-back" onClick={() => setCurrentPage('main')}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="19" y1="12" x2="5" y2="12"/>
+              <polyline points="12 19 5 12 12 5"/>
+            </svg>
+            На главную
+          </button>
+          <Rules />
+        </div>
+      )}
 
       {modalImage && (
         <ImageModal imageUrl={modalImage} onClose={() => setModalImage(null)} />
