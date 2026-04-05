@@ -216,6 +216,7 @@ function App() {
                   history={history}
                   onSelectPrompt={handleSelectPromptFromHistory}
                   onHistoryChange={handleHistoryChange}
+                  onImageClick={(url) => setModalImage(url)}
                 />
               </div>
             </div>

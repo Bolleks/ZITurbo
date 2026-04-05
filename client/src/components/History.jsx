@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { removeFromHistory, clearHistory, formatTimestamp } from '../utils/historyStore';
 
-function History({ history, onSelectPrompt, onHistoryChange }) {
+function History({ history, onSelectPrompt, onHistoryChange, onImageClick }) {
   const [expandedId, setExpandedId] = useState(null);
 
   const handleDelete = (id) => {
@@ -56,8 +56,8 @@ function History({ history, onSelectPrompt, onHistoryChange }) {
   }
 
   return (
-    <div className="card-custom">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+    <div className="card-custom history-card">
+      <div className="history-header" style={{ flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h5 className="card-custom-title" style={{ marginBottom: 0 }}>История генераций</h5>
         <button
           className="btn-clear-history"
@@ -127,7 +127,7 @@ function History({ history, onSelectPrompt, onHistoryChange }) {
             {expandedId === entry.id && (
               <div className="history-item-detail">
                 {entry.imageUrl && (
-                  <div className="history-item-image">
+                  <div className="history-item-image" onClick={() => onImageClick && onImageClick(entry.imageUrl)} style={{ cursor: 'pointer' }}>
                     <img src={entry.imageUrl} alt="Сгенерированное изображение" />
                   </div>
                 )}

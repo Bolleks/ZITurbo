@@ -506,21 +506,34 @@ textarea.input-custom {
 }
 
 /* ===== History ===== */
+.history-card {
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.history-card .card-custom-title {
+  flex-shrink: 0;
+}
+
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 500px;
+  gap: 10px;
+  max-height: calc(60vh - 80px);
+  min-height: 120px;
   overflow-y: auto;
+  overflow-x: hidden;
   padding-right: 4px;
 }
 
 .history-list::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 .history-list::-webkit-scrollbar-track {
-  background: var(--bg-tertiary);
+  background: transparent;
   border-radius: 3px;
 }
 
