@@ -13,8 +13,8 @@ function StatusTracker({ taskId, status, failMsg, customStatus }) {
   const isLoading = !customStatus && (status === 'waiting' || status === 'queuing' || status === 'generating');
 
   return (
-    <div className="card-custom">
-      <h6 className="card-custom-title">
+    <div className="card-custom" style={{ textAlign: 'center' }}>
+      <h6 className="card-custom-title" style={{ textAlign: 'center' }}>
         {customStatus ? 'Статус' : 'Статус задачи'}
       </h6>
 
@@ -24,13 +24,13 @@ function StatusTracker({ taskId, status, failMsg, customStatus }) {
         </p>
       )}
 
-      <div className={`status-badge ${config.className}`}>
+      <div className={`status-badge ${config.className}`} style={{ display: 'inline-flex' }}>
         <span className="icon">{config.icon}</span>
         <strong>{config.label}</strong>
       </div>
 
       {status === 'fail' && failMsg && (
-        <div className="error-message">
+        <div className="error-message" style={{ textAlign: 'left' }}>
           <strong>Ошибка:</strong> {failMsg}
         </div>
       )}
