@@ -225,22 +225,6 @@ function App() {
                 <PromptInput onGenerate={handleGenerate} onReset={handleReset} loading={loading} selectedPrompt={selectedPrompt} onPromptApplied={handlePromptApplied} onActionStart={handleActionStart} onActionEnd={handleActionEnd} />
               </div>
 
-              {(taskId && taskStatus !== 'success') && (
-                <div className="fade-in">
-                  <StatusTracker
-                    taskId={taskId}
-                    status={taskStatus}
-                    failMsg={failMsg}
-                  />
-                </div>
-              )}
-
-              {actionStatus && (
-                <div className="fade-in">
-                  <StatusTracker customStatus={actionStatus} />
-                </div>
-              )}
-
               <div className="fade-in">
                 <History
                   history={history}
@@ -252,8 +236,24 @@ function App() {
             </div>
 
             <div className="fade-in">
+              {(taskId && taskStatus !== 'success') && (
+                <div className="fade-in" style={{ marginBottom: 20 }}>
+                  <StatusTracker
+                    taskId={taskId}
+                    status={taskStatus}
+                    failMsg={failMsg}
+                  />
+                </div>
+              )}
+
+              {actionStatus && (
+                <div className="fade-in" style={{ marginBottom: 20 }}>
+                  <StatusTracker customStatus={actionStatus} />
+                </div>
+              )}
+
               <ImageDisplay imageUrl={imageUrl} onImageClick={() => setModalImage(imageUrl)} />
-              {!imageUrl && taskStatus !== 'fail' && (
+              {!imageUrl && !taskId && taskStatus !== 'fail' && (
                 <div className="image-placeholder">
                   <p style={{ margin: 0, fontSize: '0.95rem' }}>
                     Здесь появится сгенерированное изображение

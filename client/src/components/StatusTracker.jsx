@@ -11,6 +11,8 @@ const STATUS_CONFIG = {
 function StatusTracker({ taskId, status, failMsg, customStatus }) {
   const config = customStatus || STATUS_CONFIG[status] || STATUS_CONFIG.waiting;
   const isLoading = !customStatus && (status === 'waiting' || status === 'queuing' || status === 'generating');
+  const isActive = customStatus && !customStatus.error;
+  const isGenerating = status === 'generating';
 
   return (
     <div className="card-custom" style={{ textAlign: 'center' }}>
@@ -24,9 +26,9 @@ function StatusTracker({ taskId, status, failMsg, customStatus }) {
         </p>
       )}
 
-      <div className={`status-badge ${config.className}`} style={{ display: 'inline-flex' }}>
-        <span className="icon">{config.icon}</span>
-        <strong>{config.label}</strong>
+      <div className={`status-badge ${config.className} ${(isActive || isGenerating) ? 'status-active' : ''}`} style={{ display: 'inline-flex' }}>
+        <span className={`status-icon ${(isActive || isGenerating) ? 'status-icon-pulse' : ''}`}>{config.icon}</span>
+        <strong className={(isActive || isGenerating) ? 'status-text-blink' : ''}>{config.label}</strong>
       </div>
 
       {status === 'fail' && failMsg && (
