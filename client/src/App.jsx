@@ -27,6 +27,7 @@ function App() {
   const [history, setHistory] = useState(getHistory());
   const [modalImage, setModalImage] = useState(null);
   const [currentPage, setCurrentPage] = useState('main');
+  const [actionStatus, setActionStatus] = useState(null);
   const pollTimeoutRef = useRef(null);
   // Refs для актуальных значений в замыкании pollTaskStatus
   const promptRef = useRef('');
@@ -171,6 +172,18 @@ function App() {
     setSelectedPrompt('');
   };
 
+  const handleActionStart = (type) => {
+    setActionStatus({
+      label: type === 'analyzing' ? 'Анализ изображения' : 'Улучшение промпта',
+      icon: type === 'analyzing' ? '🔍' : '✨',
+      className: 'status-generating'
+    });
+  };
+
+  const handleActionEnd = () => {
+    setActionStatus(null);
+  };
+
   return (
     <>
       <ThemeToggle />
@@ -198,7 +211,7 @@ function App() {
           <div className="app-grid">
             <div className="app-sidebar">
               <div className="fade-in">
-                <PromptInput onGenerate={handleGenerate} onReset={handleReset} loading={loading} selectedPrompt={selectedPrompt} onPromptApplied={handlePromptApplied} />
+                <PromptInput onGenerate={handleGenerate} onReset={handleReset} loading={loading} selectedPrompt={selectedPrompt} onPromptApplied={handlePromptApplied} onActionStart={handleActionStart} onActionEnd={handleActionEnd} />
               </div>
 
               {(taskId && taskStatus !== 'success') && (
@@ -208,6 +221,12 @@ function App() {
                     status={taskStatus}
                     failMsg={failMsg}
                   />
+                </div>
+              )}
+
+              {actionStatus && (
+                <div className="fade-in">
+                  <StatusTracker customStatus={actionStatus} />
                 </div>
               )}
 

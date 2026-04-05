@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 
 const ASPECT_RATIOS = ['1:1', '4:3', '3:4', '16:9', '9:16'];
 
-function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApplied }) {
+function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApplied, onActionStart, onActionEnd }) {
   const [prompt, setPrompt] = useState('');
   const [aspectRatio, setAspectRatio] = useState('1:1');
   const [nsfwChecker, setNsfwChecker] = useState(true);
@@ -61,6 +61,7 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
 
     // Конвертируем в base64 для отправки на сервер
     setAnalyzing(true);
+    if (onActionStart) onActionStart('analyzing');
     try {
       const base64Reader = new FileReader();
       base64Reader.onload = async (event) => {
@@ -80,12 +81,14 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
           alert(data.error || 'Не удалось проанализировать изображение');
         }
         setAnalyzing(false);
+        if (onActionEnd) onActionEnd();
       };
       base64Reader.readAsDataURL(file);
     } catch (err) {
       console.error('Ошибка при анализе изображения:', err);
       alert('Ошибка при анализе изображения');
       setAnalyzing(false);
+      if (onActionEnd) onActionEnd();
     }
   };
 
@@ -100,6 +103,7 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
     if (!prompt.trim()) return;
 
     setEnhancing(true);
+    if (onActionStart) onActionStart('enhancing');
     try {
       const response = await fetch('/api/enhance-prompt', {
         method: 'POST',
@@ -119,6 +123,7 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
       alert('Ошибка при улучшении промпта');
     } finally {
       setEnhancing(false);
+      if (onActionEnd) onActionEnd();
     }
   };
 
@@ -137,21 +142,12 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
             disabled={loading || analyzing}
             style={{ flex: 1 }}
           >
-            {analyzing ? (
-              <>
-                <span className="spinner-inline" style={{ marginRight: 8 }} />
-                Анализ...
-              </>
-            ) : (
-              <>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 8 }}>
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="17 8 12 3 7 8"/>
-                  <line x1="12" y1="3" x2="12" y2="15"/>
-                </svg>
-                Загрузить изображение
-              </>
-            )}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 8 }}>
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            {analyzing ? 'Анализ...' : 'Загрузить изображение'}
           </button>
           <input
             ref={fileInputRef}
@@ -181,19 +177,10 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
             disabled={loading || enhancing || analyzing || !prompt.trim()}
             title="Улучшить промпт с помощью AI"
           >
-            {enhancing ? (
-              <>
-                <span className="spinner-inline spinner-dark" style={{ marginRight: 6 }} />
-                Улучшение...
-              </>
-            ) : (
-              <>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}>
-                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                </svg>
-                Улучшить промпт
-              </>
-            )}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}>
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+            {enhancing ? 'Улучшение...' : 'Улучшить промпт'}
           </button>
         </div>
         <textarea
@@ -245,11 +232,6 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
           <>
             <span className="spinner-inline" style={{ marginRight: 8 }} />
             Генерация...
-          </>
-        ) : analyzing ? (
-          <>
-            <span className="spinner-inline" style={{ marginRight: 8 }} />
-            Анализ изображения...
           </>
         ) : (
           'Сгенерировать'

@@ -8,13 +8,15 @@ const STATUS_CONFIG = {
   fail: { label: 'Ошибка', icon: '❌', className: 'status-fail' }
 };
 
-function StatusTracker({ taskId, status, failMsg }) {
-  const config = STATUS_CONFIG[status] || STATUS_CONFIG.waiting;
-  const isLoading = status === 'waiting' || status === 'queuing' || status === 'generating';
+function StatusTracker({ taskId, status, failMsg, customStatus }) {
+  const config = customStatus || STATUS_CONFIG[status] || STATUS_CONFIG.waiting;
+  const isLoading = !customStatus && (status === 'waiting' || status === 'queuing' || status === 'generating');
 
   return (
     <div className="card-custom">
-      <h6 className="card-custom-title">Статус задачи</h6>
+      <h6 className="card-custom-title">
+        {customStatus ? 'Статус' : 'Статус задачи'}
+      </h6>
 
       {taskId && (
         <p style={{ marginBottom: 12 }}>
@@ -41,6 +43,14 @@ function StatusTracker({ taskId, status, failMsg }) {
           <small style={{ color: 'var(--text-muted)', marginTop: 8, display: 'block' }}>
             Пожалуйста, подождите. Генерация может занять до нескольких минут...
           </small>
+        </div>
+      )}
+
+      {customStatus && (
+        <div style={{ marginTop: 16 }}>
+          <div className="progress-bar-custom">
+            <div className="progress-bar-fill" />
+          </div>
         </div>
       )}
     </div>
