@@ -38,7 +38,7 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file || loading || analyzing) return;
 
     // Проверка типа файла
     if (!file.type.startsWith('image/')) {
@@ -90,6 +90,7 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
   };
 
   const handleUploadClick = () => {
+    if (loading || analyzing) return;
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }

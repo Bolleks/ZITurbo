@@ -1,5 +1,5 @@
 const HISTORY_KEY = 'image-generator-history';
-const MAX_HISTORY = 50;
+const MAX_HISTORY = 5;
 
 export function getHistory() {
   try {
