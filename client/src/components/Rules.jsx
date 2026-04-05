@@ -2,7 +2,7 @@ import React from 'react';
 
 function Rules() {
   return (
-    <div className="rules-page">
+    <div className="rules-page" role="main">
       <div className="rules-header">
         <h1>Правила использования</h1>
         <p>Пожалуйста, внимательно ознакомьтесь с правилами перед использованием приложения</p>

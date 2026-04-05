@@ -28,6 +28,13 @@ function History({ history, onSelectPrompt, onHistoryChange, onImageClick }) {
   const handleCopyPrompt = async (prompt) => {
     try {
       await navigator.clipboard.writeText(prompt);
+      // Кратковременная обратная связь
+      const btn = event?.target?.closest('.btn-copy');
+      if (btn) {
+        const original = btn.innerHTML;
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+        setTimeout(() => { btn.innerHTML = original; }, 1200);
+      }
     } catch (err) {
       // Fallback для старых браузеров
       const textarea = document.createElement('textarea');
@@ -85,6 +92,7 @@ function History({ history, onSelectPrompt, onHistoryChange, onImageClick }) {
                   onClick={(e) => { e.stopPropagation(); handleDownload(entry.imageUrl); }}
                   title="Скачать изображение"
                   disabled={!entry.imageUrl}
+                  aria-label="Скачать изображение"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -96,6 +104,7 @@ function History({ history, onSelectPrompt, onHistoryChange, onImageClick }) {
                   className="btn-icon btn-copy"
                   onClick={(e) => { e.stopPropagation(); handleCopyPrompt(entry.prompt); }}
                   title="Скопировать промпт"
+                  aria-label="Скопировать промпт в буфер обмена"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
@@ -106,6 +115,7 @@ function History({ history, onSelectPrompt, onHistoryChange, onImageClick }) {
                   className="btn-icon btn-use-prompt"
                   onClick={(e) => { e.stopPropagation(); handleSelectPrompt(entry); }}
                   title="Использовать промпт"
+                  aria-label="Использовать этот промпт"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
@@ -115,6 +125,7 @@ function History({ history, onSelectPrompt, onHistoryChange, onImageClick }) {
                   className="btn-icon btn-delete"
                   onClick={(e) => { e.stopPropagation(); handleDelete(entry.id); }}
                   title="Удалить"
+                  aria-label="Удалить запись из истории"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <line x1="18" y1="6" x2="6" y2="18"/>

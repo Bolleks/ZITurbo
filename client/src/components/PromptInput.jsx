@@ -145,8 +145,6 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
 
   return (
     <form onSubmit={handleSubmit} className="card-custom">
-      <h5 className="card-custom-title">Настройки генерации</h5>
-
       {/* Загрузка изображения для анализа */}
       <div style={{ marginBottom: 20 }}>
         <label className="label-custom">Анализ изображения</label>
@@ -175,8 +173,24 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
           />
         </div>
         {previewUrl && (
-          <div style={{ marginTop: 12, borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)', maxHeight: '200px' }}>
-            <img src={previewUrl} alt="Preview" style={{ width: '100%', height: 'auto', display: 'block' }} />
+          <div style={{ marginTop: 12, borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)', maxHeight: '400px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-secondary)' }}>
+            <img src={previewUrl} alt="Preview" style={{ width: '100%', height: 'auto', maxHeight: '400px', objectFit: 'contain', display: 'block' }} />
+            <button
+              type="button"
+              className="btn-clear-preview"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPreviewUrl(null);
+                if (fileInputRef.current) fileInputRef.current.value = '';
+              }}
+              title="Удалить изображение"
+              aria-label="Удалить загруженное изображение"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
           </div>
         )}
       </div>

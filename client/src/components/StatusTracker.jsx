@@ -15,11 +15,7 @@ function StatusTracker({ taskId, status, failMsg, customStatus }) {
   const isGenerating = status === 'generating';
 
   return (
-    <div className="card-custom" style={{ textAlign: 'center' }}>
-      <h6 className="card-custom-title" style={{ textAlign: 'center' }}>
-        {customStatus ? 'Статус' : 'Статус задачи'}
-      </h6>
-
+    <div className="card-custom" style={{ textAlign: 'center' }} role="status" aria-live="polite" aria-atomic="true">
       {taskId && (
         <p style={{ marginBottom: 12 }}>
           <span className="task-id">{taskId}</span>
