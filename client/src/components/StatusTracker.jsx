@@ -48,9 +48,16 @@ function StatusTracker({ taskId, status, failMsg, customStatus }) {
 
       {customStatus && (
         <div style={{ marginTop: 16 }}>
-          <div className="progress-bar-custom">
-            <div className="progress-bar-fill" />
-          </div>
+          {!customStatus.error && (
+            <div className="progress-bar-custom">
+              <div className="progress-bar-fill" />
+            </div>
+          )}
+          {customStatus.error && (
+            <div className="error-message" style={{ marginTop: 0 }}>
+              <strong>Ошибка:</strong> {customStatus.error}
+            </div>
+          )}
         </div>
       )}
     </div>

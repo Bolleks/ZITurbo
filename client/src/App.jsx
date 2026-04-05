@@ -180,8 +180,19 @@ function App() {
     });
   };
 
-  const handleActionEnd = () => {
-    setActionStatus(null);
+  const handleActionEnd = (errorMsg) => {
+    if (errorMsg) {
+      setActionStatus({
+        label: 'Ошибка',
+        icon: '❌',
+        className: 'status-fail',
+        error: errorMsg
+      });
+      // Убираем статус через 5 секунд
+      setTimeout(() => setActionStatus(null), 5000);
+    } else {
+      setActionStatus(null);
+    }
   };
 
   return (

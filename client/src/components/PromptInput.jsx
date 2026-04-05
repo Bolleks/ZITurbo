@@ -65,20 +65,32 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
     try {
       const base64Reader = new FileReader();
       base64Reader.onload = async (event) => {
-        const base64Image = event.target.result;
+        try {
+          const base64Image = event.target.result;
 
-        const response = await fetch('/api/analyze-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageUrl: base64Image })
-        });
+          const response = await fetch('/api/analyze-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ imageUrl: base64Image })
+          });
 
-        const data = await response.json();
+          if (!response.ok) {
+            throw new Error(`Сервер вернул ошибку: ${response.status}`);
+          }
 
-        if (data.prompt) {
-          setPrompt(data.prompt);
-        } else {
-          alert(data.error || 'Не удалось проанализировать изображение');
+          const data = await response.json();
+
+          if (data.prompt) {
+            setPrompt(data.prompt);
+          } else {
+            alert(data.error || 'Не удалось проанализировать изображение');
+          }
+        } catch (innerErr) {
+          console.error('Ошибка при анализе изображения:', innerErr);
+          alert(innerErr.message || 'Ошибка при анализе изображения');
+          if (onActionEnd) onActionEnd(innerErr.message);
+          setAnalyzing(false);
+          return;
         }
         setAnalyzing(false);
         if (onActionEnd) onActionEnd();
@@ -86,9 +98,8 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
       base64Reader.readAsDataURL(file);
     } catch (err) {
       console.error('Ошибка при анализе изображения:', err);
-      alert('Ошибка при анализе изображения');
       setAnalyzing(false);
-      if (onActionEnd) onActionEnd();
+      if (onActionEnd) onActionEnd(err.message);
     }
   };
 
@@ -111,6 +122,10 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
         body: JSON.stringify({ prompt: prompt.trim() })
       });
 
+      if (!response.ok) {
+        throw new Error(`Сервер вернул ошибку: ${response.status}`);
+      }
+
       const data = await response.json();
 
       if (data.prompt) {
@@ -118,12 +133,13 @@ function PromptInput({ onGenerate, onReset, loading, selectedPrompt, onPromptApp
       } else {
         alert(data.error || 'Не удалось улучшить промпт');
       }
-    } catch (err) {
-      console.error('Ошибка при улучшении промпта:', err);
-      alert('Ошибка при улучшении промпта');
-    } finally {
       setEnhancing(false);
       if (onActionEnd) onActionEnd();
+    } catch (err) {
+      console.error('Ошибка при улучшении промпта:', err);
+      alert(err.message || 'Ошибка при улучшении промпта');
+      setEnhancing(false);
+      if (onActionEnd) onActionEnd(err.message);
     }
   };
 
