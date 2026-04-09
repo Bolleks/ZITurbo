@@ -97,21 +97,22 @@ app.post('/api/analyze-image', async (req, res) => {
         content: [
           {
             type: 'text',
-            text: `Твоя роль: Ты — профессиональный Prompt Engineer, специализирующийся на архитектуре S3-DiT и модели генерации изображений Z-Image-Turbo (Tongyi-MAI). Твоя задача — принимать от пользователя короткие, базовые или абстрактные идеи и превращать их в идеальные, высокодетализированные англоязычные промпты, оптимизированные под специфику версии Turbo.
-Твои главные ограничения и правила (Z-Image-Turbo Specifics):
-Объем: Итоговый промпт должен содержать до 1000 символов. Это должен быть связный текст (структурированная история), а не просто набор тегов.
-Без негативных промптов: Модель Turbo игнорирует негативные промпты. Все запреты и ограничения ты должен встраивать в позитивной форме прямо в текст (например, вместо "no text" пиши "clean background", вместо "bad anatomy" пиши "correct human anatomy, perfectly rendered fingers").
-Объективность: Избегай метафор, поэзии и невидимых эмоций. Описывай только то, что можно физически увидеть (материалы, геометрию, свет, физику).
-Решение проблем с анатомией: Всегда добавляй «якоря точности» для людей. Для лиц: "natural skin pores and texture", "no airbrushed look", "natural imperfections". Для рук: "perfectly rendered fingers", "intricate detail of knuckles".
-Текст на изображении: Если пользователь просит добавить текст, он обязательно должен быть заключен в двойные английские кавычки (например, "TEXT"). Укажи шрифт (bold, sans-serif, neon) и точное физическое расположение текста в кадре.
-Билингвальность: Если запрос касается азиатской культуры, аутентичной еды или специфической архитектуры, интегрируй соответствующие китайские термины (иероглифы).
-Алгоритм конструирования промпта (4 иерархических уровня):
-При создании промпта ты обязан последовательно раскрыть 4 уровня детализации:
-Уровень 1: Субъект и действие. Детально опиши главного героя/объект. Возраст, этнос, одежда (текстуры, ткань), выражение лица, поза, конкретное действие. Никаких «усредненных» людей.
-Уровень 2: Окружение. Точная локация, время суток, погода, атмосфера. Опиши взаимодействие субъекта с фоном (тени, отражения).
-Уровень 3: Физика света. Используй термины освещения: volumetric light, subsurface scattering, cinematic warm key light, bioluminescent glow, soft rim light.
-Уровень 4: Оптика и камера. Задай ракурс и линзу. Используй профильные термины: 85mm portrait lens (для портретов), Macro lens 100mm (для микродеталей), low-angle shot (для эпичности), shallow depth of field (для размытия фона). Для эффекта реализма соцсетей используй "candid phone photo, raw texture". В конце добавь технические параметры: "8K UHD, photorealistic".
-Формат твоего ответа пользователю: только сам промпт (не более 1000 символов), без комментариев.`
+            text: `Analyze this image in detail and create a detailed prompt that will allow for the recreation of a maximally similar image.
+
+Structure the description as follows:
+
+MAIN SUBJECT: Describe the main object/character with maximum detail (appearance, pose, clothing, facial expression).
+COMPOSITION AND PLACEMENT: Precise positioning of elements within the frame, camera angle.
+STYLE AND TECHNIQUE: Artistic style, execution technique (photography, painting, digital art).
+COLOR PALETTE: Dominant colors, lighting, contrast, saturation.
+BACKGROUND AND ENVIRONMENT: Detailed description of the background, atmosphere.
+TECHNICAL PARAMETERS: Depth of field, shot type, image quality.
+MOOD AND ATMOSPHERE: Emotional component of the image.
+Formulate the final prompt as one cohesive text, incorporating all key details in a natural order. Use concrete, descriptive terms and avoid abstract concepts. IMPORTANT: Show only the Final Prompt without your comments.
+
+EXAMPLE: "A high-quality realistic photograph of a woman with long wavy brown hair and fair skin stands in shallow water up to her knees, wearing a soft green smocked mini dress with puffed short sleeves and a square neckline. Her left leg is slightly bent, arms relaxed—left arm hanging, right arm with a thin silver bracelet, hands slightly open—while she gazes directly at the camera with a calm expression. Positioned on the left side of the frame, the eye-level camera captures her figure with soft natural golden light, shallow depth of field, and detailed fabric texture. Dominant colors include soft green (dress), blue-green (water), and warm yellow-green (background foliage), with golden light reflections on the water and the subject's reflection visible. The background features blurred greenery and yellow foliage (trees/bushes) behind a calm river/lake with gentle ripples. Mood: serene, tranquil, and naturally elegant."
+
+Important: The number of characters in the final prompt should not exceed 1,000 characters.`
           },
           {
             type: 'image_url',
