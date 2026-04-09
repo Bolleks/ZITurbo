@@ -195,7 +195,9 @@ Example 1: Vector Graphics (Marketing)
 Example 2: Photorealistic Illustration (Artistic Style)
 "A lush oil painting of a 'Dragon's Lair' in the style of 19th-century romanticism. The dragon has iridescent scales with emerald subsurface scattering, guarding a pile of gold coins with intricate detail. The environment is a damp limestone cavern with bioluminescent cyan glow reflecting off stalactites. Chiaroscuro lighting with dramatic shadows and a warm golden rim light from a distant torch. Captured with a wide-angle lens perspective to show the epic scale, rich textures of oil brushstrokes, and heavy impasto." 
 Example 3: Professional Photography (Portrait)
-"Close-up candid phone photo of a young man with natural skin texture and slight stubble, wearing a navy blue linen shirt, walking through a bustling 'Tokyo' street at night. Neon signs in '新宿' (Shinjuku) create vibrant pink and blue reflections on his face. Cinematic lighting with a soft fill light to define features. 85mm portrait lens effect with deep bokeh, sharp focus on the eyes, natural imperfections, raw mobile shot aesthetic, 8K UHD."`;
+"Close-up candid phone photo of a young man with natural skin texture and slight stubble, wearing a navy blue linen shirt, walking through a bustling 'Tokyo' street at night. Neon signs in '新宿' (Shinjuku) create vibrant pink and blue reflections on his face. Cinematic lighting with a soft fill light to define features. 85mm portrait lens effect with deep bokeh, sharp focus on the eyes, natural imperfections, raw mobile shot aesthetic, 8K UHD."
+
+IMPORTANT: Return ONLY the final enhanced prompt. Do NOT include any comments, explanations, or introductory text. Maximum 1000 characters.`;
 
     const messages = [
       {
