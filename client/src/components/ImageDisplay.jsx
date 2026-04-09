@@ -1,45 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-function ImageDisplay({ imageUrl, downloadUrl, onImageClick }) {
-  const [downloading, setDownloading] = useState(false);
-  const [downloadLink, setDownloadLink] = useState(downloadUrl || null);
-
+function ImageDisplay({ imageUrl, onImageClick }) {
   const handleClick = () => {
     if (onImageClick) {
       onImageClick();
     }
   };
 
-  const handleDownload = async () => {
-    if (downloadLink) {
-      window.open(downloadLink, '_blank');
-      return;
-    }
-
+  const handleDownload = () => {
     if (!imageUrl) return;
-
-    setDownloading(true);
-    try {
-      const response = await fetch('/api/download-url', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: imageUrl })
-      });
-
-      const data = await response.json();
-
-      if (data.code === 200 && data.data) {
-        setDownloadLink(data.data);
-        window.open(data.data, '_blank');
-      } else {
-        alert('Не удалось получить ссылку для скачивания');
-      }
-    } catch (err) {
-      console.error('Ошибка при скачивании:', err);
-      alert('Ошибка при скачивании изображения');
-    } finally {
-      setDownloading(false);
-    }
+    window.open(imageUrl, '_blank');
   };
 
   if (!imageUrl) return null;
@@ -62,23 +32,13 @@ function ImageDisplay({ imageUrl, downloadUrl, onImageClick }) {
       <button
         className="btn-success-custom"
         onClick={handleDownload}
-        disabled={downloading}
       >
-        {downloading ? (
-          <>
-            <span className="spinner-inline" style={{ marginRight: 8 }} />
-            Получение ссылки...
-          </>
-        ) : (
-          'Скачать изображение'
-        )}
+        Скачать изображение
       </button>
 
-      {downloadLink && (
-        <p className="download-hint">
-          Ссылка действительна в течение 20 минут.
-        </p>
-      )}
+      <p className="download-hint">
+        Изображение откроется в новой вкладке. Нажмите правой кнопкой мыши для сохранения.
+      </p>
     </div>
   );
 }
